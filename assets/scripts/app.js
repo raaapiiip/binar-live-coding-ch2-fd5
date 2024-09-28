@@ -20,19 +20,15 @@ class ProjectItem {
 class ProjectList {
     projects = [];
 
-    constructor(type, switchHandlerFunction) {
+    constructor(type) {
         this.type = type;
-        this.switchHandlerFunction = switchHandlerFunction; 
-
-        // #active-projects li
-        const projectItems = document.querySelectorAll(`#${type}-projects li`);
-
-        // for (let i = 0; i < this.projects.length; i++)
-        for (const projectItem of projectItems) {
-            console.log(type)
-            console.log(projectItem);
-            this.projects.push(new ProjectItem(projectItem.id, this.switchProject.bind(this)));
+        const prjItems = document.querySelectorAll(`#${type}-projects li`);
+        for (const prjItem of prjItems) {
+            this.projects.push(
+                new ProjectItem(prjItem.id, this.switchProject.bind(this))
+            );
         }
+        console.log(this.projects);
     }
 
     setSwitchHandlerFunction(switchHandlerFunction) {
@@ -44,16 +40,23 @@ class ProjectList {
     }
 
     switchProject(projectId) {
-        this.addProject();
-        this.switchHandlerFunction(this.projects.find((i) => i.id === projectId));
+        // const projectIndex = this.projects.findIndex(p => p.id === projectId);
+        // this.projects.splice(projectIndex, 1);
+        this.project = this.projects.find((i) => i.id === projectId);
+        this.projects.filter((i) => i.id !== projectId);
     }
 }
 
 class App {
     static init() {
-        const activeProjectList = new ProjectList("active");
-        const finishedProjectList = new ProjectList("finished");
-        activeProjectList.setSwitchHandlerFunction(finishedProjectList.addProject.bind());
+        const activeProjectsList = new ProjectList("active");
+        const finishedProjectsList = new ProjectList("finished");
+        activeProjectsList.setSwitchHandlerFunction(
+            finishedProjectsList.addProject.bind(finishedProjectsList)
+        );
+        finishedProjectsList.setSwitchHandlerFunction(
+            activeProjectsList.addProject.bind(activeProjectsList)
+        );
     }
 }
 
